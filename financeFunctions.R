@@ -25,6 +25,7 @@ avgOfSeq <- function(data, tickers) {
   }
   result
 }
+
 trans <- read.csv("401KCleaned.csv")
 # set date column as actual date
 trans$Date <- as.Date(trans$Date, "%m/%d/%Y")
