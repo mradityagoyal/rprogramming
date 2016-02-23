@@ -1,5 +1,5 @@
-avgPurchasePrice <- function(data, ticker){
-  price_quant <- data[data$Ticker==ticker & data$Action == "BUY", c("Price", "NumShares")] 
+avgPurchasePrice <- function(data, ticker, actions= "BUY"){
+  price_quant <- data[data$Ticker == ticker & data$Action %in% actions , c("Price", "NumShares")] 
   weighted.mean(price_quant$Price, price_quant$NumShares)
 }
 
