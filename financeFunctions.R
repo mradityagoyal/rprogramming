@@ -1,17 +1,32 @@
-avgPurchasePrice <- function(data, ticker, actions= "BUY"){
-  price_quant <- data[data$Ticker == ticker & data$Action %in% actions , c("Price", "NumShares")] 
-  weighted.mean(price_quant$Price, price_quant$NumShares)
+process_transactions <- function(data, ticker, actions = "BUY") {
+  #only for selected ticker
+  sub <-
+    data[data$Ticker == ticker & data$Action %in% actions ,]
+  sub <-
+    sub[order(sub$Date, decreasing = TRUE), ]
+  avgPurchasePrice_cb_total <- vector()
+  for (d in sub$Date) {
+    avgPurchasePrice_cb_total <-
+      rbind(avgPurchasePrice_cb_total,
+            c(
+              "CostBasis"=sum(sub$Amount[sub$Date <= d])
+              ,
+              "TotalShares"=sum(sub$NumShares[sub$Date <= d])
+            ))
+  }
+  avg<-avgPurchasePrice_cb_total[,"CostBasis"]/avgPurchasePrice_cb_total[,"TotalShares"]
+  cbind(sub, avgPurchasePrice_cb_total, "AvgPurchasePrice" = avg)
 }
 
-avgOfSeq <- function(data, tickers){
+avgOfSeq <- function(data, tickers) {
   result <- vector()
-  for(t in tickers){
-    result <- rbind(result, c(t, avgPurchasePrice(data, t)))
+  for (t in tickers) {
+    result <- rbind(result, process_transactions(data, t))
   }
-  colnames(result) <- c("Ticker", "AvgPurchasePrice")
-  colnames
   result
 }
 trans <- read.csv("401KCleaned.csv")
-avgPrices <- avgOfSeq(trans, unique(trans$Ticker))
- 
+# set date column as actual date
+trans$Date <- as.Date(trans$Date, "%m/%d/%Y")
+trans <- trans[order(trans$Date, decreasing = TRUE), ]
+exploded <- avgOfSeq(trans, unique(trans$Ticker))
