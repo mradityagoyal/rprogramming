@@ -1,6 +1,6 @@
 avgPurchasePrice <- function(data, ticker){
-  price_quant <- data[data$Ticker==ticker & data$Action == "BUY", c("Price", "Quantity")] 
-  weighted.mean(price_quant$Price, price_quant$Quantity)
+  price_quant <- data[data$Ticker==ticker & data$Action == "BUY", c("Price", "NumShares")] 
+  weighted.mean(price_quant$Price, price_quant$NumShares)
 }
 
 avgOfSeq <- function(data, tickers){
@@ -12,5 +12,6 @@ avgOfSeq <- function(data, tickers){
   colnames
   result
 }
-
-
+trans <- read.csv("401KCleaned.csv")
+avgPrices <- avgOfSeq(trans, unique(trans$Ticker))
+ 
