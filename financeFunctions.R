@@ -31,3 +31,5 @@ trans <- read.csv("401KCleaned.csv")
 trans$Date <- as.Date(trans$Date, "%m/%d/%Y")
 trans <- trans[order(trans$Date, decreasing = TRUE), ]
 exploded <- avgOfSeq(trans, unique(trans$Ticker))
+library(ggplot2)
+qplot(Date, CostBasis, data=exploded, color = Ticker, geom = "line")
