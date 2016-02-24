@@ -54,6 +54,22 @@ findTicker <- function(x) {
   as.character(tickers$ticker[as.character(tickers$investment) == x])
 }
 
+equityOnDate <- function(exploded, date = Sys.Date()) {
+  result <- vector()
+  for (ticker in unique(exploded$Ticker)) {
+    maxDate <-
+      max(exploded$Date[exploded$Ticker == ticker &
+                          exploded$Date < date])
+    if (exploded$Shares[exploded$Date == maxDate &
+                        exploded$Ticker == ticker] > 0) {
+      result <-
+        rbind(result, c(ticker, exploded$CostBasis[exploded$Date == maxDate &
+                                                     exploded$Ticker == ticker]))
+    }
+  }
+  result
+}
+
 trans <-
   read.csv("history.csv",
            colClasses = c("character", "factor", "factor", "numeric", "numeric"))
@@ -70,9 +86,11 @@ trans$Date <- as.Date(trans$Date, "%m/%d/%Y")
 trans <- trans[order(trans$Date, decreasing = TRUE), ]
 trans$Price <- round(trans$Amount / trans$Shares, digits = 2)
 exploded <- avgOfSeq(trans, unique(trans$Investment))
+exploded$Ticker <-
+  as.factor(sapply(exploded$Investment, findTicker))
 library(ggplot2)
-qplot(Date,
-      CostBasis,
-      data = exploded,
-      color = Investment,
-      geom = "line")
+#qplot(Date,
+#      CostBasis,
+#      data = exploded,
+#      color = Ticker,
+#      geom = "line")
