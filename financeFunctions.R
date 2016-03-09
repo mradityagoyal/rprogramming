@@ -71,8 +71,10 @@ equityOnDate <- function(exploded, date = Sys.Date()) {
 }
 
 trans <-
-  read.csv("history.csv",
-           colClasses = c("character", "factor", "factor", "numeric", "numeric"))
+  read.csv("history.csv", colClasses = c("character", "factor", "factor", "character", "character"))
+trans$Amount <- as.numeric(trans$Amount)
+trans$Shares.Unit <- as.numeric(trans$Shares.Unit)
+
 #keep change in market value rows for future.
 changeInMkt <-
   trans[trans$Transaction.Type == "Change In Market Value",]
@@ -89,8 +91,14 @@ exploded <- avgOfSeq(trans, unique(trans$Investment))
 exploded$Ticker <-
   as.factor(sapply(exploded$Investment, findTicker))
 library(ggplot2)
-#qplot(Date,
-#      CostBasis,
-#      data = exploded,
-#      color = Ticker,
-#      geom = "line")
+qplot(Date,
+      CostBasis,
+      data = exploded,
+      color = Ticker,
+      geom = "line")
+
+qplot(Ticker,
+      +       Price,
+      +       data = exploded,
+      +       color = Ticker,
+      +       geom = "boxplot")
